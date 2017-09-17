@@ -20,20 +20,22 @@ public class TestObjCConvertor extends ExtTest {
 	public void testWithoutPath() {
 		createNonValidObjCConvertor();
 	}
-	
+
 	@Test
 	public void testCreateGenerator() {
 		IConvertor generator = createValidObjCConvertor();
 		assertNotNull(generator);
 	}
-	
+
 	@Test
-	public void testWitoutExist() {
+	public void testWithoutDestFiles() {
 		IConvertor generator = createValidObjCConvertor();
 		try {
 			File[] list = new File("./dest").listFiles();
-			for (File file : list) {
-				file.delete();
+			if (list != null && list.length > 0) {
+				for (File file : list) {
+					file.delete();
+				}
 			}
 			generator.generate(null);
 			assertTrue(true);
@@ -41,7 +43,7 @@ public class TestObjCConvertor extends ExtTest {
 			LoggerUtils.getLoggerInstance().error(e.getMessage(), e);
 		}
 	}
-	
+
 	@Test
 	public void testWithExist() {
 		IConvertor generator = createValidObjCConvertor();
@@ -60,7 +62,7 @@ public class TestObjCConvertor extends ExtTest {
 		try {
 			generator.generate(null);
 		} catch (FileCouldNotReadException e) {
-			LoggerUtils.getLoggerInstance().error(e.getMessage(),e);
+			LoggerUtils.getLoggerInstance().error(e.getMessage(), e);
 		}
 		fail("Not Excepted");
 
