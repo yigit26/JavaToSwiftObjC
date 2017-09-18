@@ -24,7 +24,7 @@ public class VariablesUtils {
 		return VariablesUtils.swiftVariableMap;
 	}
 
-	public String getTypeSwiftToJava(String javaType) {
+	public String getTypeSwiftFromJava(String javaType) {
 		if (VariablesUtils.getInstance().getSwiftVariableMap().containsKey(javaType)) {
 			return VariablesUtils.getInstance().getSwiftVariableMap().get(javaType);
 		}
@@ -35,8 +35,8 @@ public class VariablesUtils {
 				String type0 = null;
 				String type1 = null;
 				while (matcher.find()) {
-					type0 = getTypeSwiftToJava(matcher.group(1));
-					type1 = getTypeSwiftToJava(matcher.group(2));
+					type0 = getTypeSwiftFromJava(matcher.group(1));
+					type1 = getTypeSwiftFromJava(matcher.group(2));
 				}
 				return "[" + type0 + " : " + type1 + "]";
 			} else {
@@ -44,12 +44,27 @@ public class VariablesUtils {
 				Matcher matcher = pattern.matcher(javaType);
 				String type0 = null;
 				while (matcher.find()) {
-					type0 = getTypeSwiftToJava(matcher.group(1));
+					type0 = getTypeSwiftFromJava(matcher.group(1));
 				}
 				return "[" + type0 + "]";
 			}
 		}
 		return javaType;
+	}
+
+	public String getTypeObjCFromJava(String javaType) {
+		if (VariablesUtils.getInstance().getObjCVariableMap().containsKey(javaType)) {
+			return VariablesUtils.getInstance().getObjCVariableMap().get(javaType);
+		}
+		if (javaType.contains("<")) {
+			if (javaType.contains(",")) {
+				return "NSMutableDictionary*";
+			} else {
+				return "NSMutableArray*";
+			}
+
+		}
+		return javaType + "*";
 	}
 
 	private void setupSwiftVariables() {
@@ -72,29 +87,26 @@ public class VariablesUtils {
 	}
 
 	private void setupObjCVariables() {
-		String nsNumber = " NSNumber*";
-		objeCVariableMap.put("private String", StringConstants.STRONG + " NSString*");
-		objeCVariableMap.put("private Character", StringConstants.STRONG + " NSString*");
-		objeCVariableMap.put("private Date", StringConstants.STRONG + " NSDate*");
-		objeCVariableMap.put("private boolean", StringConstants.ASSIGN + " BOOL");
-		objeCVariableMap.put("private Boolean", StringConstants.ASSIGN + " BOOL");
-		objeCVariableMap.put("private Integer", StringConstants.STRONG + nsNumber);
-		objeCVariableMap.put("private Double", StringConstants.STRONG + nsNumber);
-		objeCVariableMap.put("private Float", StringConstants.STRONG + nsNumber);
-		objeCVariableMap.put("private Long", StringConstants.STRONG + nsNumber);
-		objeCVariableMap.put("private Short", StringConstants.ASSIGN + " NSInteger");
-		objeCVariableMap.put("private Byte", StringConstants.STRONG + " NSInteger*");
-		objeCVariableMap.put("private BigInteger", StringConstants.STRONG + nsNumber);
-		objeCVariableMap.put("private BigDecimal", StringConstants.ASSIGN + " NSDecimal");
-		objeCVariableMap.put("private int", StringConstants.ASSIGN + " int");
-		objeCVariableMap.put("private long", StringConstants.ASSIGN + " long");
-		objeCVariableMap.put("private double", StringConstants.ASSIGN + " double");
-		objeCVariableMap.put("private float", StringConstants.ASSIGN + " float");
-		objeCVariableMap.put("private short", StringConstants.ASSIGN + " short");
-		objeCVariableMap.put("private byte", StringConstants.ASSIGN + " int");
-		objeCVariableMap.put("private List<[A-Za-z_]+>", StringConstants.STRONG + " NSMutableArray*");
-		objeCVariableMap.put("private HashMap<[A-Za-z_ ,]+>", StringConstants.STRONG + " NSMutableDictionary*");
-		objeCVariableMap.put("private Map<[A-Za-z_ ,]+>", StringConstants.STRONG + " NSMutableDictionary*");
+		String nsNumber = "NSNumber*";
+		objeCVariableMap.put("String", "NSString*");
+		objeCVariableMap.put("Character", "NSString*");
+		objeCVariableMap.put("Date", "NSDate*");
+		objeCVariableMap.put("boolean", "BOOL");
+		objeCVariableMap.put("Boolean", "BOOL");
+		objeCVariableMap.put("Integer", nsNumber);
+		objeCVariableMap.put("Double", nsNumber);
+		objeCVariableMap.put("Float", nsNumber);
+		objeCVariableMap.put("Long", nsNumber);
+		objeCVariableMap.put("Short", "NSInteger");
+		objeCVariableMap.put("Byte", "NSInteger*");
+		objeCVariableMap.put("BigInteger", nsNumber);
+		objeCVariableMap.put("BigDecimal", "NSDecimal");
+		objeCVariableMap.put("int", "int");
+		objeCVariableMap.put("long", "long");
+		objeCVariableMap.put("double", "double");
+		objeCVariableMap.put("float", "float");
+		objeCVariableMap.put("short", "short");
+		objeCVariableMap.put("byte", "int");
 	}
 
 	public static VariablesUtils getInstance() {

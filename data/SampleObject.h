@@ -9,18 +9,18 @@
 #import "EmptyObject.h"
 
 
-@interface SampleObject 
-@property (nonatomic,assign)  NSDecimal bigDecimal;
-@property (nonatomic,strong)  NSNumber* bigInteger;
-@property (nonatomic,strong)  NSString* name;
-@property (nonatomic,strong)  NSDate* date;
-@property (nonatomic,assign)  long longP;
-@property (nonatomic,strong)  NSMutableArray* list;
-@property (nonatomic,strong)  NSMutableDictionary* hashMap;
-@property (nonatomic,assign)  short shortP;
-@property (nonatomic,assign)  BOOL booleanObj;
-@property (nonatomic,assign)  BOOL bool;
-@property (nonatomic,strong)  EmptyObject* emptyObject;
+@interface SampleObject
 
+@property (nonatomic,assign) NSDecimal bigDecimal;
+@property (nonatomic,strong) NSNumber* bigInteger;
+@property (nonatomic,strong) NSString* name;
+@property (nonatomic,strong) NSDate* date;
+@property (nonatomic,assign) long longP;
+@property (nonatomic,strong) NSMutableArray* list;
+@property (nonatomic,strong) NSMutableDictionary* hashMap;
+@property (nonatomic,assign) short shortP;
+@property (nonatomic,assign) BOOL booleanObj;
+@property (nonatomic,assign) BOOL bool;
+@property (nonatomic,strong) EmptyObject* emptyObject;
 
 @end

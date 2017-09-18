@@ -18,8 +18,6 @@ import com.yigitcanture.convertor.util.VariablesUtils;
 
 class SwiftConvertor extends BaseConvertor implements IConvertor {
 
-	private HashMap<String, String> mapVarType = new HashMap<>();
-
 	SwiftConvertor(Convertor convertor) {
 		super(convertor);
 	}
@@ -68,27 +66,6 @@ class SwiftConvertor extends BaseConvertor implements IConvertor {
 		}
 	}
 
-	/***
-	 * 
-	 * @param textJavaFile
-	 *            content of source file.
-	 * @return {@link String} returns properties which were found in source file
-	 */
-	private String findProperties(String textJavaFile) {
-		Pattern pat = Pattern.compile(StringConstants.PRIVATE_PATTERN);
-		Matcher match = pat.matcher(textJavaFile);
-		StringBuilder propsBuilder = new StringBuilder();
-		while (match.find()) {
-			String s = match.group();
-			s = s.trim();
-			if (s.charAt(s.length() - 1) != ';') {
-				s += ";";
-			}
-			propsBuilder.append(s);
-			propsBuilder.append("\n");
-		}
-		return propsBuilder.toString();
-	}
 
 	/***
 	 * This method is used to fill {@link HashMap}<{@link String},{@link String}>.
@@ -100,7 +77,7 @@ class SwiftConvertor extends BaseConvertor implements IConvertor {
 		Pattern pat = Pattern.compile(StringConstants.PATTERN_CATCH_PROPERTY);
 		Matcher matcher = pat.matcher(props);
 		while (matcher.find()) {
-			String type = VariablesUtils.getInstance().getTypeSwiftToJava(matcher.group(1));
+			String type = VariablesUtils.getInstance().getTypeSwiftFromJava(matcher.group(1));
 			String varName = matcher.group(2);
 			mapVarType.put(varName, type);
 		}

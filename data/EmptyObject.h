@@ -8,8 +8,7 @@
 
 
 
-@interface EmptyObject 
-
+@interface EmptyObject
 
 
 @end

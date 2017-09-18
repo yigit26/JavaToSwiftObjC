@@ -107,17 +107,14 @@ class ObjectiveCConvertor extends BaseConvertor implements IConvertor {
 		try {
 			String textJavaFile = FileUtils.readFile(sourceFile);
 			String props = findProperties(textJavaFile);
-			for (HashMap.Entry<String, String> val : VariablesUtils.getInstance().getObjCVariableMap().entrySet()) {
-				props = props.replaceAll(val.getKey(), val.getValue());
-			}
-			props = findSpecialProperties(props);
+			findAndPutAllPropertiesToMap(props);
 			File file = new File(this.convertor.getDestinationPath() + File.separator + filename + ".h");
 			if (file.createNewFile()) {
 				LoggerUtils.getLoggerInstance().info(filename + ".h file created.");
 			} else {
 				LoggerUtils.getLoggerInstance().info(filename + ".h file is exist or could not created.");
 			}
-			writeHFile(file, props, filename);
+			writeHFile(file, filename);
 		} catch (IOException e) {
 			LoggerUtils.getLoggerInstance().error(e.getMessage(), e);
 			throw new FileCouldNotCreatedException(e);
@@ -125,68 +122,44 @@ class ObjectiveCConvertor extends BaseConvertor implements IConvertor {
 	}
 
 	/***
-	 * This method is used to find Java types. Like String,Date,HashMap etc.
-	 * 
-	 * @param textJavaFile
-	 * @return
-	 */
-	private String findProperties(String textJavaFile) {
-		Pattern pat = Pattern.compile(StringConstants.PRIVATE_PATTERN);
-		Matcher match = pat.matcher(textJavaFile);
-		StringBuilder propsBuilder = new StringBuilder();
-		while (match.find()) {
-			String s = match.group();
-			s = s.trim();
-			if (s.charAt(s.length() - 1) != ';') {
-				s += ";";
-			}
-			propsBuilder.append(s);
-			propsBuilder.append("\n");
-		}
-		return propsBuilder.toString();
-	}
-
-	/***
-	 * This method is used to find special classes which are created by users.
+	 * This method is used to fill {@link HashMap}<{@link String},{@link String}>.
+	 * key is variable name. value is type of variable.
 	 * 
 	 * @param props
-	 *            Indicates
-	 * @return {@link String} returns properties which were found in source file
 	 */
-	private String findSpecialProperties(String props) {
-		Pattern pattern = Pattern.compile(StringConstants.PRIVATE_PATTERN_2);
-		Matcher match2 = pattern.matcher(props);
+	private void findAndPutAllPropertiesToMap(String props) {
 		externalImportList = new ArrayList<>();
-		while (match2.find()) {
-			String s = match2.group().replace("private ", "");
-			if (!externalImportList.contains(s))
-				externalImportList.add(s);
+		mapVarType.clear();
+		Pattern pat = Pattern.compile(StringConstants.PATTERN_CATCH_PROPERTY);
+		Matcher matcher = pat.matcher(props);
+		while (matcher.find()) {
+			String javaType = matcher.group(1);
+			String type = VariablesUtils.getInstance().getTypeObjCFromJava(javaType);
+			if(type.contains("*") && type.equals(javaType+ "*")) {
+				externalImportList.add(javaType);
+			}
+			String varName = matcher.group(2);
+			mapVarType.put(varName, type);
 		}
-		String changedProps = props.replace("private", StringConstants.STRONG);
-		for (String s : externalImportList) {
-			changedProps = changedProps.replace(s, s + "*");
-		}
-		return changedProps;
 	}
+
 
 	/**
 	 * This method is used to write .h file.
 	 * 
 	 * @param file
 	 *            Indicates destination file.
-	 * @param props
-	 *            Indicates destination file name.
 	 * @param filename
 	 *            Indicates destination file name.
 	 */
-	private void writeHFile(File file, String props, String filename) {
+	private void writeHFile(File file, String filename) {
 		try (FileWriter writer = new FileWriter(file)) {
 			StringBuilder sb = new StringBuilder();
 			sb.append(CommentUtils.createComment(filename + ".h", convertor.getCompanyName(),
 					convertor.getProjectName()));
 			sb.append(generateImports());
-			String properties = createObjCProps(props);
-			sb.append("\n\n@interface " + filename + " \n");
+			String properties = createObjCProps();
+			sb.append("\n\n@interface " + filename + "\n");
 			sb.append(properties);
 			sb.append("\n\n@end");
 			writer.write(sb.toString());
@@ -208,7 +181,6 @@ class ObjectiveCConvertor extends BaseConvertor implements IConvertor {
 				sb.append("#import \"" + s + ".h\"\n");
 			}
 		}
-
 		return sb.toString();
 	}
 
@@ -219,14 +191,19 @@ class ObjectiveCConvertor extends BaseConvertor implements IConvertor {
 	 *            properties which are found from source file
 	 * @return {@link String} returns Objective C properties.
 	 */
-	private String createObjCProps(String props) {
-		String[] strProps = props.split("\\n");
-		StringBuilder propsBuilder = new StringBuilder();
-		for (String str : strProps) {
-			propsBuilder.append(str);
-			propsBuilder.append("\n");
+	private String createObjCProps() {
+		StringBuilder sb = new StringBuilder();
+		for (HashMap.Entry<String, String> val : mapVarType.entrySet()) {
+			sb.append("\n@property (nonatomic,");
+			if(val.getValue().contains("*")) {
+				sb.append("strong)");
+			} else {
+				sb.append("assign)");
+			}
+			sb.append(" " + val.getValue() + " ");
+			sb.append(val.getKey() + ";");
 		}
-		return propsBuilder.toString();
+		return sb.toString();
 	}
 	// ************ GENERATE H FILE END ************
 

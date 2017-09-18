@@ -8,8 +8,8 @@
 
 
 
-@interface SampleObject2 
-@property (nonatomic,strong)  NSNumber* longObj;
+@interface SampleObject2
 
+@property (nonatomic,strong) NSNumber* longObj;
 
 @end
