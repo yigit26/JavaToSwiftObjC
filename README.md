@@ -1,5 +1,6 @@
 # JavaToSwiftObjC
 
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/244c4c49511d4e31a5c261560fff1b34)](https://www.codacy.com/app/yigit26/JavaToSwiftObjC?utm_source=github.com&utm_medium=referral&utm_content=yigit26/JavaToSwiftObjC&utm_campaign=badger)
 [![Build Status](https://travis-ci.org/yigit26/JavaToSwiftObjC.svg?branch=master)](https://travis-ci.org/yigit26/JavaToSwiftObjC)
 [![codecov](https://codecov.io/gh/yigit26/JavaToSwiftObjC/branch/master/graph/badge.svg)](https://codecov.io/gh/yigit26/JavaToSwiftObjC)
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/244c4c49511d4e31a5c261560fff1b34)](https://www.codacy.com/app/yigit26/JavaToSwiftObjC?utm_source=github.com&utm_medium=referral&utm_content=yigit26/JavaToSwiftObjC&utm_campaign=badger)
