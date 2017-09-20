@@ -9,9 +9,6 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
-
 import com.yigitcanture.convertor.exception.FileCouldNotCreatedException;
 import com.yigitcanture.convertor.exception.FileCouldNotReadException;
 import com.yigitcanture.convertor.model.Convertor;
