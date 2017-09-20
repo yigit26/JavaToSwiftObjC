@@ -9,6 +9,9 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.log4j.LogManager;
+import org.apache.log4j.Logger;
+
 import com.yigitcanture.convertor.exception.FileCouldNotCreatedException;
 import com.yigitcanture.convertor.exception.FileCouldNotReadException;
 import com.yigitcanture.convertor.model.Convertor;
@@ -27,8 +30,8 @@ class ObjectiveCConvertor extends BaseConvertor implements IConvertor {
 
 	@Override
 	public void generate(IConvertorCallback callback) throws FileCouldNotCreatedException, FileCouldNotReadException {
-		this.callback = callback;
-		findFiles(this.convertor.getSourcePath());
+		setCallback(callback);
+		findFiles(getConvertor().getSourcePath());
 	}
 
 	@Override
@@ -36,8 +39,8 @@ class ObjectiveCConvertor extends BaseConvertor implements IConvertor {
 			throws FileCouldNotCreatedException, FileCouldNotReadException {
 		generateM(filename);
 		generateH(filename, file);
-		if (callback != null) {
-			callback.notify(filename + ".h / " + filename + ".m were generated.");
+		if (getCallback() != null) {
+			getCallback().notify(filename + ".h / " + filename + ".m were generated.");
 		}
 	}
 
@@ -52,7 +55,7 @@ class ObjectiveCConvertor extends BaseConvertor implements IConvertor {
 	 * @throws FileCouldNotCreatedException
 	 */
 	private void generateM(String filename) throws FileCouldNotCreatedException {
-		File file = new File(this.convertor.getDestinationPath() + File.separator + filename + ".m");
+		File file = new File(getConvertor().getDestinationPath() + File.separator + filename + ".m");
 		try {
 			if (file.createNewFile()) {
 				LoggerUtils.getLoggerInstance().info(filename + ".m file created.");
@@ -64,8 +67,8 @@ class ObjectiveCConvertor extends BaseConvertor implements IConvertor {
 		}
 		try (FileWriter writer = new FileWriter(file)) {
 			StringBuilder sb = new StringBuilder();
-			sb.append(CommentUtils.createComment(filename + ".m", convertor.getCompanyName(),
-					convertor.getProjectName()));
+			sb.append(CommentUtils.createComment(filename + ".m", getConvertor().getCompanyName(),
+					getConvertor().getProjectName()));
 			sb.append(generateImport(filename));
 			writer.write(sb.toString());
 			writer.close();
@@ -108,7 +111,7 @@ class ObjectiveCConvertor extends BaseConvertor implements IConvertor {
 			String textJavaFile = FileUtils.readFile(sourceFile);
 			String props = findProperties(textJavaFile);
 			findAndPutAllPropertiesToMap(props);
-			File file = new File(this.convertor.getDestinationPath() + File.separator + filename + ".h");
+			File file = new File(getConvertor().getDestinationPath() + File.separator + filename + ".h");
 			if (file.createNewFile()) {
 				LoggerUtils.getLoggerInstance().info(filename + ".h file created.");
 			} else {
@@ -129,20 +132,19 @@ class ObjectiveCConvertor extends BaseConvertor implements IConvertor {
 	 */
 	private void findAndPutAllPropertiesToMap(String props) {
 		externalImportList = new ArrayList<>();
-		mapVarType.clear();
+		getMapVarType().clear();
 		Pattern pat = Pattern.compile(StringConstants.PATTERN_CATCH_PROPERTY);
 		Matcher matcher = pat.matcher(props);
 		while (matcher.find()) {
 			String javaType = matcher.group(1);
 			String type = VariablesUtils.getInstance().getTypeObjCFromJava(javaType);
-			if(type.contains("*") && type.equals(javaType+ "*")) {
+			if (type.contains("*") && type.equals(javaType + "*")) {
 				externalImportList.add(javaType);
 			}
 			String varName = matcher.group(2);
-			mapVarType.put(varName, type);
+			getMapVarType().put(varName, type);
 		}
 	}
-
 
 	/**
 	 * This method is used to write .h file.
@@ -155,8 +157,8 @@ class ObjectiveCConvertor extends BaseConvertor implements IConvertor {
 	private void writeHFile(File file, String filename) {
 		try (FileWriter writer = new FileWriter(file)) {
 			StringBuilder sb = new StringBuilder();
-			sb.append(CommentUtils.createComment(filename + ".h", convertor.getCompanyName(),
-					convertor.getProjectName()));
+			sb.append(CommentUtils.createComment(filename + ".h", getConvertor().getCompanyName(),
+					getConvertor().getProjectName()));
 			sb.append(generateImports());
 			String properties = createObjCProps();
 			sb.append("\n\n@interface " + filename + "\n");
@@ -193,9 +195,9 @@ class ObjectiveCConvertor extends BaseConvertor implements IConvertor {
 	 */
 	private String createObjCProps() {
 		StringBuilder sb = new StringBuilder();
-		for (HashMap.Entry<String, String> val : mapVarType.entrySet()) {
+		for (HashMap.Entry<String, String> val : getMapVarType().entrySet()) {
 			sb.append("\n@property (nonatomic,");
-			if(val.getValue().contains("*")) {
+			if (val.getValue().contains("*")) {
 				sb.append("strong)");
 			} else {
 				sb.append("assign)");

@@ -68,13 +68,12 @@ public class ConvertorBuilder {
 			throw new UnknownLanguageException();
 		}
 		Convertor convertor = new Convertor(destinationPath, sourcePath, companyName, projectName);
-		switch (language) {
-		case OBJECTIVEC:
+		if(language.equals(Language.OBJECTIVEC)) {
 			return new ObjectiveCConvertor(convertor);
-		case SWIFT:
+		} else if(language.equals(Language.SWIFT)) {
 			return new SwiftConvertor(convertor);
-		default:
-			throw new UnknownLanguageException();
+		} else {
+			return null;
 		}
 
 	}

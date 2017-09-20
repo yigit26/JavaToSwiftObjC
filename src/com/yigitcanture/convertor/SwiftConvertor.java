@@ -24,16 +24,16 @@ class SwiftConvertor extends BaseConvertor implements IConvertor {
 
 	@Override
 	public void generate(IConvertorCallback callback) throws FileCouldNotCreatedException, FileCouldNotReadException {
-		this.callback = callback;
-		findFiles(this.convertor.getSourcePath());
+		setCallback(callback);
+		findFiles(getConvertor().getSourcePath());
 	}
 
 	@Override
 	public void generateFiles(String filename, File file)
 			throws FileCouldNotCreatedException, FileCouldNotReadException {
 		generateSwiftFile(filename, file);
-		if (callback != null) {
-			callback.notify(filename + ".swift was generated.");
+		if (getCallback() != null) {
+			getCallback().notify(filename + ".swift was generated.");
 		}
 	}
 
@@ -49,11 +49,11 @@ class SwiftConvertor extends BaseConvertor implements IConvertor {
 	private void generateSwiftFile(String filename, File file)
 			throws FileCouldNotReadException, FileCouldNotCreatedException {
 		try {
-			mapVarType.clear();
+			getMapVarType().clear();
 			String textJavaFile = FileUtils.readFile(file);
 			String props = findProperties(textJavaFile);
 			findAndPutAllPropertiesToMap(props);
-			File destinationFile = new File(convertor.getDestinationPath() + File.separator + filename + ".swift");
+			File destinationFile = new File(getConvertor().getDestinationPath() + File.separator + filename + ".swift");
 			if (destinationFile.createNewFile()) {
 				LoggerUtils.getLoggerInstance().info(filename + ".swift file created.");
 			} else {
@@ -79,7 +79,7 @@ class SwiftConvertor extends BaseConvertor implements IConvertor {
 		while (matcher.find()) {
 			String type = VariablesUtils.getInstance().getTypeSwiftFromJava(matcher.group(1));
 			String varName = matcher.group(2);
-			mapVarType.put(varName, type);
+			getMapVarType().put(varName, type);
 		}
 	}
 
@@ -92,8 +92,8 @@ class SwiftConvertor extends BaseConvertor implements IConvertor {
 	private void writeSwiftFile(File file, String filename) {
 		try (FileWriter writer = new FileWriter(file)) {
 			StringBuilder sb = new StringBuilder();
-			sb.append(CommentUtils.createComment(filename + ".swift", convertor.getCompanyName(),
-					convertor.getProjectName()));
+			sb.append(CommentUtils.createComment(filename + ".swift", getConvertor().getCompanyName(),
+					getConvertor().getProjectName()));
 			String properties = createSwiftProperties();
 			sb.append("\nimport UIKit\n");
 			sb.append("\n\nclass " + filename + " {\n");
@@ -116,7 +116,7 @@ class SwiftConvertor extends BaseConvertor implements IConvertor {
 	 */
 	private String createSwiftProperties() {
 		StringBuilder sb = new StringBuilder();
-		for (HashMap.Entry<String, String> val : mapVarType.entrySet()) {
+		for (HashMap.Entry<String, String> val : getMapVarType().entrySet()) {
 			sb.append("\n\tprivate var ");
 			sb.append("_" + val.getKey() + " : ");
 			sb.append(val.getValue() + "!");
@@ -132,7 +132,7 @@ class SwiftConvertor extends BaseConvertor implements IConvertor {
 		StringBuilder sb = new StringBuilder();
 		sb.append("\n\tinit(");
 		String comma = "";
-		for (HashMap.Entry<String, String> val : mapVarType.entrySet()) {
+		for (HashMap.Entry<String, String> val : getMapVarType().entrySet()) {
 			sb.append(comma);
 			sb.append(val.getKey());
 			sb.append(" : ");
@@ -140,7 +140,7 @@ class SwiftConvertor extends BaseConvertor implements IConvertor {
 			comma = ",";
 		}
 		sb.append(") { \n");
-		for (String varName : mapVarType.keySet()) {
+		for (String varName : getMapVarType().keySet()) {
 			sb.append("\t\t_");
 			sb.append(varName);
 			sb.append(" = ");
@@ -157,7 +157,7 @@ class SwiftConvertor extends BaseConvertor implements IConvertor {
 	 */
 	private String generatePublicMethods() {
 		StringBuilder sb = new StringBuilder();
-		for (HashMap.Entry<String, String> val : mapVarType.entrySet()) {
+		for (HashMap.Entry<String, String> val : getMapVarType().entrySet()) {
 			sb.append("\n\tvar ");
 			sb.append(val.getKey());
 			sb.append(" : ");
